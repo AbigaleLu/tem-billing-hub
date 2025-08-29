@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TEM Settlement Hub</title>
+  <style>
+    :root{
+      --bg:#f7f7f8; --card:#ffffff; --text:#111113; --sub:#6b7280; --line:#e6e6e8;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Segoe UI, Arial, system-ui, sans-serif;
+      --radius:16px; --shadow:0 12px 30px rgba(0,0,0,.06);
+    }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans)}
+    .wrap{max-width:1080px;margin:36px auto;padding:0 18px}
+    .title{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+    .logo{width:32px;height:32px;border-radius:12px;background:linear-gradient(180deg,#fff,#f2f2f3);box-shadow:inset 0 0 0 1px var(--line),0 2px 6px rgba(0,0,0,.05)}
+    h1{font-size:22px;margin:0;font-weight:700}
+    .muted{color:var(--sub)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card .head{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:600;color:#444}
+    .card .body{padding:14px 16px}
+    .row{display:flex;gap:10px;align-items:center;margin:8px 0}
+    .row label{min-width:108px;color:#444}
+    input[type=text],input[type=number], select{flex:1;border:1px solid var(--line);background:#fbfbfc;color:var(--text);border-radius:12px;padding:10px 12px;font-size:14px;appearance:none;-webkit-appearance:none;-moz-appearance:none}
+    input[type=number]{width:140px}
+    select{cursor:pointer;background:#fbfbfc}
+    .hr{height:1px;background:var(--line);margin:10px 0}
+    .btn{border:1px solid var(--line);background:#fff;color:#111;padding:8px 14px;border-radius:12px;cursor:pointer;font-weight:600;font-size:14px}
+    .btn.primary{background:#111;color:#fff}
+    .fee-table{width:100%;border-collapse:collapse;margin-top:6px;background:#f8f9fb;border-radius:12px;overflow:hidden;cursor:pointer}
+    .fee-table th,.fee-table td{padding:8px;text-align:center;border-bottom:1px solid #ececec}
+    .fee-table th{background:#f1f2f4;color:#333}
+    .fee-table tfoot td{background:#eff0f2;font-weight:600}
+    .code{font-family:var(--mono);white-space:pre-wrap;word-break:break-word;background:#111;color:#f1f1f1;border-radius:14px;padding:16px;min-height:180px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title"><div class="logo"></div><h1>TEM Settlement Hub</span></h1></div>
+
+  <div class="grid">
+    <div class="card" id="feeCard">
+      <div class="head">计费输入</div>
+      <div class="body">
+        <div class="row"><label>日期</label><input id="date" type="text" placeholder="如 8/27 或 0827"/></div>
+        <div class="row"><label>样品名</label><input id="samples" type="text" placeholder="多个样品用中文分号；分隔"/></div>
+        <div class="row"><label>测试人</label><input id="tester" type="text" placeholder="如：纳瑞"/></div>
+        <div class="hr"></div>
+        <div class="row"><label>TEM</label><input id="tem" type="number" min="0" step="0.25" value="0"/></div>
+        <div class="row"><label>STEM</label><input id="stem" type="number" min="0" step="0.25" value="0"/></div>
+        <div class="row"><label>SAED</label><input id="saed" type="number" min="0" step="1" value="0"/></div>
+        <div class="row"><label>HRTEM</label><input id="hrtem" type="number" min="0" step="1" value="0"/></div>
+        <div class="row"><label>EDS mapping</label><input id="edsmap" type="number" min="0" step="1" value="0"/></div>
+        <div class="row"><label>EDS linescan</label><input id="edsline" type="number" min="0" step="1" value="0"/></div>
+        <div class="row"><label>AC-STEM</label><input id="acstem" type="number" min="0" step="0.5" value="0"/></div>
+        <div class="row"><button class="btn primary" id="calc">计算费用</button><button class="btn" id="reset">清空</button></div>
+        <div id="feeOut"></div>
+      </div>
+    </div>
+
+    <div class="card" id="mdCard">
+      <div class="head">条目与金额</div>
+      <div class="body">
+        <div class="row"><label>条目</label><input id="itemsLine" type="text"/></div>
+        <div class="row"><label>报价</label><input id="quoted" type="number" step="1"/></div>
+        <div class="row"><label>OA</label><input id="oa" type="number" step="1"/></div>
+        <div class="row"><label>报告模式</label>
+          <select id="mode">
+            <option value="A">滴答存档用</option>
+            <option value="B">纳瑞存档用</option>
+            <option value="C">Excel存档用</option>
+          </select>
+        </div>
+        <div class="hr"></div>
+        <div class="row"><button class="btn primary" id="gen">生成</button><button class="btn" id="copyMd">复制</button><button class="btn" id="downloadMd">导出 .txt</button></div>
+        <div class="code" id="mdOut"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const fmt=(n,d=2)=>isFinite(n)?Number(n).toFixed(d):(0).toFixed(d);
+  const fmtNum=(x)=>{const n=Number(x);return Number.isInteger(n)? String(n) : String(Number(n.toFixed(2)));};
+  const safeI=v=>parseInt(v)||0;const safeF=v=>parseFloat(v)||0;
+  const RATE={TEM:500,STEM:650,SAED:200,HRTEM:600,EDSMAP:750,EDSLINE:100,ACSTEM:3000};
+  const OA_RATIO=1.4, ACTUAL_RATIO=0.7;
+
+  function parseDateA(str){
+    if(/^[0-9]{4}$/.test(str)) return str.replace(/^(\d{2})(\d{2})$/,(m,mm,dd)=>mm.replace(/^0/,"")+"/"+dd.replace(/^0/,""));
+    return str.replaceAll('.', '/');
+  }
+  function parseDateB(str){
+    if(/^[0-9]{4}$/.test(str)){
+      const year=new Date().getFullYear();
+      return year.toString()+str;
+    }
+    const d=new Date();
+    const parts=str.replaceAll('.', '/').split('/');
+    if(parts.length===2){
+      return d.getFullYear().toString()+parts[0].padStart(2,'0')+parts[1].padStart(2,'0');
+    }
+    return str;
+  }
+
+  function calc(){
+    const tem=safeF($("tem").value), stem=safeF($("stem").value), saed=safeI($("saed").value), hrtem=safeI($("hrtem").value), edsmap=safeI($("edsmap").value), edsline=safeI($("edsline").value), acstem=safeF($("acstem").value);
+    const tem_fee=RATE.TEM*(tem/0.5), stem_fee=RATE.STEM*(stem/0.5), saed_fee=RATE.SAED*saed, hrtem_fee=RATE.HRTEM*hrtem, edsmap_fee=RATE.EDSMAP*edsmap, edsline_fee=RATE.EDSLINE*edsline, acstem_fee=RATE.ACSTEM*acstem;
+    const quoted=tem_fee+stem_fee+saed_fee+hrtem_fee+edsmap_fee+edsline_fee+acstem_fee;
+
+    const table=`<table class=fee-table id=copyTable title="点击复制条目">
+      <tr><th>项目</th><th>单价</th><th>数量</th><th>小计</th></tr>
+      <tr><td>TEM</td><td>${RATE.TEM}</td><td>${fmt(tem,2)}</td><td>${fmt(tem_fee)}</td></tr>
+      <tr><td>STEM</td><td>${RATE.STEM}</td><td>${fmt(stem,2)}</td><td>${fmt(stem_fee)}</td></tr>
+      <tr><td>SAED</td><td>${RATE.SAED}</td><td>${saed}</td><td>${fmt(saed_fee)}</td></tr>
+      <tr><td>HRTEM</td><td>${RATE.HRTEM}</td><td>${hrtem}</td><td>${fmt(hrtem_fee)}</td></tr>
+      <tr><td>EDS mapping</td><td>${RATE.EDSMAP}</td><td>${edsmap}</td><td>${fmt(edsmap_fee)}</td></tr>
+      <tr><td>EDS linescan</td><td>${RATE.EDSLINE}</td><td>${edsline}</td><td>${fmt(edsline_fee)}</td></tr>
+      <tr><td>AC-STEM</td><td>${RATE.ACSTEM}</td><td>${fmt(acstem,2)}</td><td>${fmt(acstem_fee)}</td></tr>
+      <tfoot><tr><td colspan=3>合计</td><td>${fmt(quoted)}</td></tr></tfoot></table>`;
+    $("feeOut").innerHTML=table;
+
+    $("quoted").value=fmt(quoted);
+    if(!$("oa").value) $("oa").value=fmt(quoted*OA_RATIO);
+
+    $("copyTable").onclick=()=>{
+      const items=[];if(saed>0)items.push(`SAED x${saed}`);if(hrtem>0)items.push(`HRTEM x${hrtem}`);if(edsmap>0)items.push(`EDS mapping x${edsmap}`);if(edsline>0)items.push(`EDS linescan x${edsline}`);if(tem>0)items.push(`TEM x${fmt(tem,2)}h`);if(stem>0)items.push(`STEM x${fmt(stem,2)}h`);if(acstem>0)items.push(`AC-STEM x${fmt(acstem,2)}h`);
+      const str=items.join(', ');
+      navigator.clipboard.writeText(str);
+      $("itemsLine").value=str;
+    };
+
+    return {quoted,tem,acstem};
+  }
+
+  function makeMarkdown(){
+    const rawDate=($("date").value||'').trim();
+    const mode=$("mode").value;
+    const tester=$("tester").value.trim();
+    const itemsLine=$("itemsLine").value.trim();
+    const {quoted,tem,acstem}=calc();
+    const quotedVal=parseFloat($("quoted").value||quoted)||0;
+    const oaVal=parseFloat($("oa").value)||quotedVal*OA_RATIO;
+    const actual=quotedVal*ACTUAL_RATIO;
+    const samples=($("samples").value.trim()||'').split('；').map(s=>s.trim()).filter(Boolean);
+
+    let out="";
+    if(mode==="A"){
+      const dateA=parseDateA(rawDate);
+      out+=`::${dateA}::\n`;
+      if(samples.length){samples.forEach((s,i)=>{out+=`${i+1}. ${s} ✅\n`;out+=i==0?`> ${itemsLine}\n`:`> 见上\n`;});}
+      else{out+=`1. 未命名项目 ✅\n> ${itemsLine}\n`;}
+      out+=`> ${fmt(quotedVal)} / ${fmt(oaVal)} / ${fmt(actual)} RMB\n`;
+      if(tester)out+=`> 测试人：${tester}\n`;
+      out+=`---`;
+    } else if(mode==="B"){
+      const dateB=parseDateB(rawDate);
+      if(tem>0){ out+=`日期：${dateB}\n电镜：场发射（检查）\n测试时间：${fmt(tem*60,0)}分钟\n测试老师：禄晓玥\n备注：${samples.join('；')}\n\n`; }
+      if(acstem>0){ out+=`日期：${dateB}\n电镜：球差\n测试时间：${fmt(acstem,0)}小时\n测试老师：禄晓玥\n备注：${samples.join('；')}\n`; }
+    } else {
+      const dateC=parseDateB(rawDate);
+      const sampleCell=samples.join('；');
+      if(tem>0){
+        const hours=tem; const minutes=Math.round(tem*60);
+        out+=`场发射\t${sampleCell}\t检查\t${dateC}\t${fmtNum(hours)}\t${minutes}\n`;
+      }
+      if(acstem>0){
+        const hours=acstem; const minutes=Math.round(acstem*60);
+        out+=`球差\t${sampleCell}\t原子像\t${dateC}\t${fmtNum(hours)}\t${minutes}\n`;
+      }
+    }
+
+    $("mdOut").textContent=out;return out;
+  }
+
+  $("calc").onclick=()=>calc();
+  $("reset").onclick=()=>{location.reload();};
+  $("gen").onclick=()=>makeMarkdown();
+  $("copyMd").onclick=()=>{const t=$("mdOut").textContent;if(!t)makeMarkdown();navigator.clipboard.writeText($("mdOut").textContent)};
+  $("downloadMd").onclick=()=>{const blob=new Blob([$("mdOut").textContent||makeMarkdown()],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='TEM-output.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),500);};
+
+  $("oa").addEventListener('click',()=>{
+    const n=Math.round(parseFloat($("oa").value)||0);
+    navigator.clipboard.writeText(String(n));
+  });
+})();
+</script>
+</body>
+</html>
