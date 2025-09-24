@@ -1,345 +1,298 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TEM Billing Hub</title>
-    <style>
-        :root{
-            --bg:#f7f7f8; --card:#ffffff; --text:#111113; --sub:#6b7280; --line:#e6e6e8;
-            --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-            --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Segoe UI, Arial, system-ui, sans-serif;
-            --radius:16px; --shadow:0 12px 30px rgba(0,0,0,.06);
-        }
-        body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans)}
-        .wrap{max-width:1080px;margin:36px auto;padding:0 18px}
-        .title{display:flex;align-items:center;gap:12px;margin-bottom:18px}
-        .logo{width:32px;height:32px;border-radius:12px;background:linear-gradient(180deg,#fff,#f2f2f3);box-shadow:inset 0 0 0 1px var(--line),0 2px 6px rgba(0,0,0,.05)}
-        h1{font-size:22px;margin:0;font-weight:700}
-        .muted{color:var(--sub)}
-        .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-        @media(max-width:980px){.grid{grid-template-columns:1fr}}
-        .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow); position: relative;}
-        .card .head{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:600;color:#444}
-        .card .body{padding:14px 16px}
-        .row{display:flex;gap:10px;align-items:center;margin:8px 0}
-        .row label{min-width:108px;color:#444}
-        input[type=text],input[type=number], select{flex:1;border:1px solid var(--line);background:#fbfbfc;color:var(--text);border-radius:12px;padding:10px 12px;font-size:14px;appearance:none;-webkit-appearance:none;-moz-appearance:none}
-        input[type=number]{width:140px}
-        select{cursor:pointer;background:#fbfbfc}
-        .hr{height:1px;background:var(--line);margin:10px 0}
-        .btn{border:1px solid var(--line);background:#fff;color:#111;padding:8px 14px;border-radius:12px;cursor:pointer;font-weight:600;font-size:14px}
-        .btn.primary{background:#111;color:#fff}
-        .fee-table{width:100%;border-collapse:collapse;margin-top:6px;background:#f8f9fb;border-radius:12px;overflow:hidden;}
-        .fee-table th,.fee-table td{padding:8px;text-align:center;border-bottom:1px solid #ececec}
-        .fee-table th{background:#f1f2f4;color:#333}
-        .fee-table tfoot td{background:#eff0f2;font-weight:600}
-        .code{font-family:var(--mono);white-space:pre-wrap;word-break:break-word;background:#111;color:#f1f1f1;border-radius:14px;padding:16px;min-height:180px}
-        .toast {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            pointer-events: none;
-        }
-        .toast.show {
-            opacity: 1;
-        }
-        .collapsible-container {
-            display: none;
-        }
-        .collapsible-container.expanded {
-            display: block;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TEM Billing Hub</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg:#f7f7f8; --card:#ffffff; --text:#111113; --sub:#6b7280; --line:#e6e6e8;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Segoe UI, Arial, system-ui, sans-serif;
+      --radius:16px; --shadow:0 12px 30px rgba(0,0,0,.06);
+    }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans)}
+    .wrap{max-width:1080px;margin:36px auto;padding:0 18px}
+    .title{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.title .logo{
+  background:none; box-shadow:none; /* 取消背景和阴影 */
+  display:grid; place-items:center; font-size:28px;
+}
+.title .logo::before{ content:"💸"; }
+
+    h1{font-size:22px;margin:0;font-weight:700}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow); position: relative;}
+    .card .head{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:600;color:#444}
+    .card .body{padding:14px 16px}
+    .row{display:flex;gap:10px;align-items:center;margin:8px 0}
+    .row label{min-width:108px;color:#444}
+    input[type=text],input[type=number], select{flex:1;border:1px solid var(--line);background:#fbfbfc;color:#111;border-radius:12px;padding:10px 12px;font-size:14px;appearance:none;-webkit-appearance:none;-moz-appearance:none}
+    input[type=number]{width:140px}
+    select{cursor:pointer;background:#fbfbfc}
+    .hr{height:1px;background:var(--line);margin:10px 0}
+    .btn{border:1px solid var(--line);background:#fff;color:#111;padding:8px 14px;border-radius:12px;cursor:pointer;font-weight:600;font-size:14px}
+    .btn.primary{background:#111;color:#fff}
+    .fee-table{width:100%;border-collapse:collapse;margin-top:6px;background:#f8f9fb;border-radius:12px;overflow:hidden;}
+    .fee-table th,.fee-table td{padding:8px;text-align:center;border-bottom:1px solid #ececec}
+    .fee-table th{background:#f1f2f4;color:#333}
+    .fee-table tfoot td{background:#eff0f2;font-weight:600}
+    .code{font-family:var(--mono);white-space:pre-wrap;word-break:break-word;background:#111;color:#f1f1f1;border-radius:14px;padding:16px;min-height:180px}
+    .toast {position: absolute;bottom: 20px;left: 50%;transform: translateX(-50%);background-color: rgba(0, 0, 0, 0.7);color: white;padding: 10px 20px;border-radius: 8px;opacity: 0;transition: opacity 0.25s;pointer-events: none;}
+    .toast.show {opacity: 1;}
+    .collapsible-container {display: none;}
+    .collapsible-container.expanded {display: block;}
+  </style>
 </head>
 <body>
 <div class="wrap">
-    <div class="title"><div class="logo"></div><h1>TEM Billing Hub</span></h1></div>
-    <div class="grid">
-        <div class="card" id="feeCard">
-            <div class="head">计费输入</div>
-            <div class="body">
-                <div class="row"><label>日期</label><input id="date" type="text" placeholder="如 8/27 或 0827"/></div>
-                <div class="row"><label>样品名</label><input id="samples" type="text" placeholder="多个样品用中文分号；分隔"/></div>
-                <div class="row"><label>测试人</label><input id="tester" type="text" placeholder="如：纳瑞"/></div>
-                <div class="hr"></div>
-                <div class="row"><label>TEM</label><input id="tem" type="number" min="0" step="0.25" value="0"/></div>
-                <div class="row"><label>STEM</label><input id="stem" type="number" min="0" step="0.25" value="0"/></div>
-                <div class="row"><label>SAED</label><input id="saed" type="number" min="0" step="1" value="0"/></div>
-                <div class="row"><label>HRTEM</label><input id="hrtem" type="number" min="0" step="1" value="0"/></div>
-                <div class="row"><label>EDS mapping</label><input id="edsmap" type="number" min="0" step="1" value="0"/></div>
-                <div class="collapsible-container" id="optionalItems">
-                    <div class="row"><label>EDS linescan</label><input id="edsline" type="number" min="0" step="1" value="0"/></div>
-                    <div class="row"><label>AC-STEM</label><input id="acstem" type="number" min="0" step="0.5" value="0"/></div>
-                    <div class="row"><label>离子减薄</label><input id="ionthinning" type="number" min="0" step="1" value="0"/></div>
-                <!--     <div class="row"><label>暗场</label><input id="darkfield" type="number" min="0" step="1" value="0"/></div>-->
-                    <div class="row"><label>EELS</label><input id="eels" type="number" min="0" step="0.5" value="0"/></div>
-                </div>
-                <div class="row">
-                    <button class="btn primary" id="calc">计算费用</button>
-                    <button class="btn" id="reset">清空</button>
-                    <button class="btn" id="copyItems">复制条目</button>
-                    <button class="btn" id="toggleItems">展开更多项目</button>
-                </div>
-                <div id="feeOut"></div>
-            </div>
-            <div id="toast" class="toast"></div>
+  <div class="title"><div class="logo"></div><h1>TEM Billing Hub</h1></div>
+  <div class="grid">
+    <!-- 左：计费输入 -->
+    <div class="card" id="feeCard">
+      <div class="head">计费输入</div>
+      <div class="body">
+        <div class="row"><label>日期</label><input id="date" type="text" placeholder="如 8/27 或 0827"/></div>
+        <div class="row"><label>样品名</label><input id="samples" type="text" placeholder="多个样品用中文分号；分隔"/></div>
+        <div class="row"><label>测试人</label><input id="tester" type="text" placeholder="如：纳瑞"/></div>
+        <div class="hr"></div>
+        <div class="row"><label>TEM</label><input id="tem" type="number" min="0" step="0.25" value="0"/></div>
+        <div class="row"><label>STEM</label><input id="stem" type="number" min="0" step="0.25" value="0"/></div>
+        <div class="row"><label>SAED</label><input id="saed" type="number" min="0" step="1" value="0"/></div>
+        <div class="row"><label>HRTEM</label><input id="hrtem" type="number" min="0" step="1" value="0"/></div>
+        <div class="row"><label>EDS mapping</label><input id="edsmap" type="number" min="0" step="1" value="0"/></div>
+        <div class="collapsible-container" id="optionalItems">
+          <div class="row"><label>EDS linescan</label><input id="edsline" type="number" min="0" step="1" value="0"/></div>
+          <div class="row"><label>AC-STEM</label><input id="acstem" type="number" min="0" step="0.5" value="0"/></div>
+          <div class="row"><label>离子减薄</label><input id="ionthinning" type="number" min="0" step="1" value="0"/></div>
+          <div class="row"><label>EELS</label><input id="eels" type="number" min="0" step="0.5" value="0"/></div>
         </div>
-
-        <div class="card" id="mdCard">
-            <div class="head">条目与金额</div>
-            <div class="body">
-                <div class="row"><label>条目</label><input id="itemsLine" type="text"/></div>
-                <div class="row"><label>报价</label><input id="quoted" type="number" step="1"/></div>
-                <div class="row"><label>OA</label><input id="oa" type="number" step="1"/><button class="btn" id="copyOaBtn">复制 OA</button></div>
-                <div class="row"><label>报告模式</label>
-                    <select id="mode">
-                        <option value="A">滴答存档用</option>
-                        <option value="B">纳瑞存档用</option>
-                        <option value="C">Excel存档用</option>
-                    </select>
-                </div>
-                <div class="hr"></div>
-                <div class="row">
-                    <button class="btn primary" id="gen">生成</button>
-                    <button class="btn" id="copyMd">复制</button>
-                    <button class="btn" id="downloadMd">导出 .txt</button>
-                </div>
-                <div class="code" id="mdOut"></div>
-            </div>
+        <div class="row">
+          <button class="btn primary" id="calc">计算费用</button>
+          <button class="btn" id="reset">清空</button>
+          <button class="btn" id="toggleItems">展开更多项目</button>
         </div>
+        <div id="feeOut"></div>
+      </div>
+      <div id="toast" class="toast"></div>
     </div>
+
+    <!-- 右：条目与金额 -->
+    <div class="card" id="mdCard">
+      <div class="head">条目与金额</div>
+      <div class="body">
+        <div class="row"><label>条目</label><input id="itemsLine" type="text"/><button class="btn" id="copyItems">复制条目</button></div>
+        <div class="row"><label>报价</label><input id="quoted" type="number" step="1"/></div>
+        <div class="row"><label>OA</label><input id="oa" type="number" step="1"/><button class="btn" id="copyOaBtn">复制 OA</button></div>
+        <div class="row"><label>报告模式</label>
+          <select id="mode">
+            <option value="A">滴答存档用</option>
+            <option value="B">纳瑞存档用</option>
+            <option value="C">Excel存档用</option>
+          </select>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <button class="btn primary" id="gen">生成</button>
+          <button class="btn" id="copyMd">复制</button>
+          <button class="btn" id="downloadMd">导出 .txt</button>
+        </div>
+        <div class="code" id="mdOut"></div>
+      </div>
+    </div>
+  </div>
 </div>
 <script>
 (function(){
-    const $ = id => document.getElementById(id);
-    const fmt = (n, d = 2) => isFinite(n) ? Number(n).toFixed(d) : (0).toFixed(d);
-    const fmtNum = (x) => { const n = Number(x); return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2))); };
-    const safeI = v => parseInt(v) || 0;
-    const safeF = v => parseFloat(v) || 0;
-    const showToast = (message) => {
-        const toast = $('toast');
-        toast.textContent = message;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2000);
-    };
+  const $ = id => document.getElementById(id);
+  const fmt1 = n => (isFinite(n) ? Number(n).toFixed(1) : '0.0');
+  const fmtNum = x => { const n = Number(x); return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2))); };
+  const safeI = v => parseInt(v) || 0;
+  const safeF = v => parseFloat(v) || 0;
+  const money = n => String(Math.round(Number(n)||0)); // 金额 -> 整数
 
-    const RATE = { TEM: 500, STEM: 650, SAED: 200, HRTEM: 600, EDSMAP: 750, EDSLINE: 100, ACSTEM: 3000, IONTHIN: 1200, EELS: 2000 };
-    const OA_RATIO = 1.4, ACTUAL_RATIO = 0.7;
+  function showToast(message){ const toast=$('toast'); if(!toast) return; toast.textContent=message; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1600); }
 
-    // Set default date
-    const today = new Date();
-    const month = today.getMonth() + 1;
-    const day = today.getDate();
-    $('date').value = `${month}/${day}`;
+  const RATE = { TEM: 500, STEM: 650, SAED: 200, HRTEM: 600, EDSMAP: 750, EDSLINE: 100, ACSTEM: 3000, IONTHIN: 1200, EELS: 2000 };
+  const OA_RATIO = 1.4, ACTUAL_RATIO = 0.7;
 
-    // Fix for clipboard API issue
-    function copyToClipboardFallback(text) {
-        let success = false;
-        try {
-            const tempInput = document.createElement('textarea');
-            tempInput.style.position = 'fixed';
-            tempInput.style.opacity = '0';
-            tempInput.value = text;
-            document.body.appendChild(tempInput);
-            tempInput.focus();
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            success = true;
-        } catch (err) {
-            console.error('Failed to copy text using execCommand', err);
-        }
-        return success;
+  // —— 并列逻辑开关（已开启） ——
+  const EXCEL_EELS_INDEPENDENT = true;  // C 模式：EELS 独立一行
+  const MODEB_EELS_INDEPENDENT  = true;  // B 模式：EELS 独立一条记录
+
+  // 默认日期
+  const today = new Date();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  if($('date')) $('date').value = `${month}/${day}`;
+
+  function copyToClipboardFallback(text){ try{ const ta=document.createElement('textarea'); ta.style.position='fixed'; ta.style.opacity='0'; ta.value=text; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return true; }catch{ return false } }
+
+  function calculateFees(){
+    const tem = safeF($("tem").value), stem = safeF($("stem").value), saed = safeI($("saed").value), hrtem = safeI($("hrtem").value), edsmap = safeI($("edsmap").value), edsline = safeI($("edsline").value), acstem = safeF($("acstem").value), ionthinning = safeI($('ionthinning').value);
+    const eels = safeF($('eels').value);
+
+    const tem_fee = RATE.TEM * (tem / 0.5);
+    const stem_fee = RATE.STEM * (stem / 0.5);
+    const quoted = tem_fee + stem_fee + RATE.SAED*saed + RATE.HRTEM*hrtem + RATE.EDSMAP*edsmap + RATE.EDSLINE*edsline + RATE.ACSTEM*acstem + RATE.IONTHIN*ionthinning + RATE.EELS*eels;
+
+    const table = `<table class="fee-table">
+      <tr><th>项目</th><th>单价</th><th>数量</th><th>小计</th></tr>
+      <tr><td>TEM</td><td>${RATE.TEM}</td><td>${fmt1(tem)}</td><td>${money(tem_fee)}</td></tr>
+      <tr><td>STEM</td><td>${RATE.STEM}</td><td>${fmt1(stem)}</td><td>${money(stem_fee)}</td></tr>
+      <tr><td>SAED</td><td>${RATE.SAED}</td><td>${saed}</td><td>${money(RATE.SAED*saed)}</td></tr>
+      <tr><td>HRTEM</td><td>${RATE.HRTEM}</td><td>${hrtem}</td><td>${money(RATE.HRTEM*hrtem)}</td></tr>
+      <tr><td>EDS mapping</td><td>${RATE.EDSMAP}</td><td>${edsmap}</td><td>${money(RATE.EDSMAP*edsmap)}</td></tr>
+      <tr><td>EDS linescan</td><td>${RATE.EDSLINE}</td><td>${edsline}</td><td>${money(RATE.EDSLINE*edsline)}</td></tr>
+      <tr><td>AC-STEM</td><td>${RATE.ACSTEM}</td><td>${fmt1(acstem)}</td><td>${money(RATE.ACSTEM*acstem)}</td></tr>
+      <tr><td>离子减薄</td><td>${RATE.IONTHIN}</td><td>${ionthinning}</td><td>${money(RATE.IONTHIN*ionthinning)}</td></tr>
+      <tr><td>EELS</td><td>${RATE.EELS}</td><td>${fmt1(eels)}</td><td>${money(RATE.EELS*eels)}</td></tr>
+      <tfoot><tr><td colspan="3">合计</td><td>${money(quoted)}</td></tr></tfoot></table>`;
+    $("feeOut").innerHTML = table;
+
+    $("quoted").value = money(quoted);
+    $("oa").value = money(quoted * OA_RATIO);
+
+    return { quoted, tem, acstem };
+  }
+
+  function copyItems(){
+    const tem = safeF($("tem").value), stem = safeF($("stem").value), saed = safeI($("saed").value), hrtem = safeI($("hrtem").value), edsmap = safeI($("edsmap").value), edsline = safeI($("edsline").value), acstem = safeF($("acstem").value), ionthinning = safeI($('ionthinning').value), eels = safeF($('eels').value);
+    const items = [];
+    if (tem > 0) items.push(`TEM x${fmt1(tem)}h`);
+    if (stem > 0) items.push(`STEM x${fmt1(stem)}h`);
+    if (saed > 0) items.push(`SAED x${saed}`);
+    if (hrtem > 0) items.push(`HRTEM x${hrtem}`);
+    if (edsmap > 0) items.push(`EDS mapping x${edsmap}`);
+    if (edsline > 0) items.push(`EDS linescan x${edsline}`);
+    if (acstem > 0) items.push(`AC-STEM x${fmt1(acstem)}h`);
+    if (eels > 0) items.push(`EELS x${fmt1(eels)}h`);
+    if (ionthinning > 0) items.push(`离子减薄 x${ionthinning}`);
+
+    const str = items.join(', ');
+    $("itemsLine").value = str;
+    copyToClipboardFallback(str) ? showToast("条目已复制!") : showToast("复制失败，请手动复制。");
+  }
+
+  function parseDateA(str){ if (/^\d{4}$/.test(str)) return str.replace(/^(\d{2})(\d{2})$/, (m, mm, dd) => mm.replace(/^0/, "") + "/" + dd.replace(/^0/, "")); return String(str||'').replaceAll('.', '/'); }
+  function parseDateB(str){ if (/^\d{4}$/.test(str)) { const year = new Date().getFullYear(); return year.toString() + str; } const d = new Date(); const parts = String(str||'').replaceAll('.', '/').split('/'); if (parts.length === 2) { return d.getFullYear().toString() + parts[0].padStart(2, '0') + parts[1].padStart(2, '0'); } return String(str||''); }
+
+  function makeMarkdown(){
+    const rawDate = ($("date").value || '').trim();
+    const mode = $("mode").value;
+    const tester = $("tester").value.trim();
+    const itemsLine = $("itemsLine").value.trim();
+    const { quoted, tem, acstem } = calculateFees();
+    const quotedVal = parseFloat($("quoted").value || quoted) || 0;
+    const oaVal = parseFloat($("oa").value) || quotedVal * OA_RATIO;
+    const actual = quotedVal * ACTUAL_RATIO;
+    const samples = ($("samples").value.trim() || '').split('；').map(s => s.trim()).filter(Boolean);
+
+    const eelsVal = safeF($("eels").value);
+
+    const q = money(quotedVal), oa = money(oaVal), act = money(actual);
+
+    let out = "";
+    if (mode === "A") {
+      const dateA = parseDateA(rawDate);
+      out += `::${dateA}::\n`;
+      out += (samples.length ? `1. ${samples.join('；')} ✅\n` : `1. 未命名项目 ✅\n`);
+      out += `> ${itemsLine}\n`;
+      out += `> ${q} / ${oa} / ${act} RMB\n`;
+      if (tester) out += `> 测试人：${tester}\n`;
+      out += `---`;
+    } else if (mode === "B") {
+      const dateB = parseDateB(rawDate);
+      if (tem > 0) {
+        out += `日期：${dateB}\n电镜：场发射（检查）\n测试时间：${Math.round(tem*60)}分钟\n测试老师：禄晓玥\n备注：${samples.join('；')}\n\n`;
+      }
+      // AC-STEM 记录（不受 EELS 影响）
+      if (acstem > 0) {
+        out += `日期：${dateB}\n电镜：球差\n测试时间：${fmt1(acstem)}小时\n测试老师：禄晓玥\n备注：${samples.join('；')}\n`;
+      }
+      // EELS 独立记录（并列）
+      if (MODEB_EELS_INDEPENDENT && eelsVal > 0) {
+        out += `日期：${dateB}\n电镜：球差（EELS）\n测试时间：${fmt1(eelsVal)}小时\n测试老师：禄晓玥\n备注：${samples.join('；')}\n`;
+      }
+    } else {
+      const dateC = parseDateB(rawDate);
+      const sampleCell = samples.join('；');
+      if (tem > 0) {
+        const hours = tem; const minutes = Math.round(tem * 60);
+        out += `场发射\t${sampleCell}\t检查\t${dateC}\t${fmtNum(hours)}\t${minutes}\n`;
+      }
+      // AC-STEM 行（第三列固定“原子像”）
+      if (acstem > 0) {
+        const hours = acstem; const minutes = Math.round(acstem * 60);
+        out += `球差\t${sampleCell}\t原子像\t${dateC}\t${fmtNum(hours)}\t${minutes}\n`;
+      }
+      // EELS 独立行（并列）
+      if (EXCEL_EELS_INDEPENDENT && eelsVal > 0) {
+        const eHours = eelsVal; const eMinutes = Math.round(eelsVal * 60);
+        out += `球差\t${sampleCell}\tEELS\t${dateC}\t${fmtNum(eHours)}\t${eMinutes}\n`;
+      }
     }
+    $("mdOut").textContent = out;
+    return out;
+  }
 
-    // Clear all inputs
-    function resetInputs() {
-        const inputs = document.querySelectorAll('#feeCard input[type="text"], #feeCard input[type="number"]');
-        inputs.forEach(input => {
-            if (input.type === 'number') {
-                input.value = 0;
-            } else {
-                input.value = '';
-            }
-        });
-        $('feeOut').innerHTML = '';
-        $('quoted').value = '';
-        $('oa').value = '';
-        $('itemsLine').value = '';
-        $('mdOut').textContent = '';
-        $('date').value = `${month}/${day}`;
+  function resetInputs(){
+    const inputs = document.querySelectorAll('#feeCard input[type="text"], #feeCard input[type="number"]');
+    inputs.forEach(input => { input.type === 'number' ? input.value = 0 : input.value = ''; });
+    $('feeOut').innerHTML = '';
+    $('quoted').value = '';
+    $('oa').value = '';
+    $('itemsLine').value = '';
+    $('mdOut').textContent = '';
+    if($('date')) $('date').value = `${month}/${day}`;
+    showToast('已清空');
+  }
+
+  function bind(id, event, handler){ const el = $(id); if(!el){ console.warn('[bind] 元素不存在:', id); return; } el.addEventListener(event, handler); }
+
+  bind('calc', 'click', ()=>{ calculateFees(); copyItems(); makeMarkdown(); });
+  bind('reset', 'click', ()=> resetInputs());
+  bind('copyItems', 'click', ()=> copyItems());
+  bind('gen', 'click', ()=> makeMarkdown());
+  bind('copyMd', 'click', ()=>{ const t = $('mdOut').textContent || makeMarkdown(); copyToClipboardFallback(t) ? showToast('内容已复制!') : showToast('复制失败，请手动复制。'); });
+  bind('downloadMd','click', ()=>{ const blob = new Blob([$('mdOut').textContent || makeMarkdown()], { type: 'text/plain;charset=utf-8' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'TEM-output.txt'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 500); });
+
+  bind('toggleItems','click', ()=>{ const optional = $('optionalItems'); optional.classList.toggle('expanded'); const isOpen = optional.classList.contains('expanded'); $('toggleItems').textContent = isOpen ? '收起不常用项目' : '展开更多项目'; });
+
+  bind('copyOaBtn','click', ()=>{ const n = money($("oa").value); copyToClipboardFallback(String(n)) ? showToast('OA值已复制!') : showToast('复制失败，请手动复制。'); });
+  if($("oa")) $("oa").addEventListener('click', ()=>{ const n=money($("oa").value); copyToClipboardFallback(String(n)) ? showToast('OA值已复制!') : showToast('复制失败，请手动复制。'); });
+
+document.querySelectorAll('input[type="number"]').forEach(el=>{ 
+    el.addEventListener('wheel', (e)=>{ 
+        if(document.activeElement===el) e.preventDefault(); 
+    }, {passive:false}); 
+});
+
+document.addEventListener('keydown', (e)=>{
+    if((e.metaKey||e.ctrlKey) && e.key==='Enter'){ 
+        e.preventDefault(); 
+        const b = $('calc'); 
+        if(b) b.click(); 
     }
-
-    // Parse date for format A
-    function parseDateA(str) {
-        if (/^[0-9]{4}$/.test(str)) return str.replace(/^(\d{2})(\d{2})$/, (m, mm, dd) => mm.replace(/^0/, "") + "/" + dd.replace(/^0/, ""));
-        return str.replaceAll('.', '/');
-    }
-
-    // Parse date for formats B and C
-    function parseDateB(str) {
-        if (/^[0-9]{4}$/.test(str)) {
-            const year = new Date().getFullYear();
-            return year.toString() + str;
-        }
-        const d = new Date();
-        const parts = str.replaceAll('.', '/').split('/');
-        if (parts.length === 2) {
-            return d.getFullYear().toString() + parts[0].padStart(2, '0') + parts[1].padStart(2, '0');
-        }
-        return str;
-    }
-
-    function calculateFees() {
-        const tem = safeF($("tem").value), stem = safeF($("stem").value), saed = safeI($("saed").value), hrtem = safeI($("hrtem").value), edsmap = safeI($("edsmap").value), edsline = safeI($("edsline").value), acstem = safeF($("acstem").value), ionthinning = safeI($('ionthinning').value);
-        const eels = safeF($('eels').value);
+    if(e.key==='Escape'){ 
+        e.preventDefault(); 
+        const r = $('reset'); 
+        if(r) r.click();
         
-        const tem_fee = RATE.TEM * (tem / 0.5), stem_fee = RATE.STEM * (stem / 0.5), saed_fee = RATE.SAED * saed, hrtem_fee = RATE.HRTEM * hrtem, edsmap_fee = RATE.EDSMAP * edsmap, edsline_fee = RATE.EDSLINE * edsline, acstem_fee = RATE.ACSTEM * acstem, ionthinning_fee = RATE.IONTHIN * ionthinning;
-        const eels_fee = RATE.EELS * eels;
-        
-        const quoted = tem_fee + stem_fee + saed_fee + hrtem_fee + edsmap_fee + edsline_fee + acstem_fee + ionthinning_fee + eels_fee;
-
-        const table = `<table class="fee-table">
-            <tr><th>项目</th><th>单价</th><th>数量</th><th>小计</th></tr>
-            <tr><td>TEM</td><td>${RATE.TEM}</td><td>${fmt(tem, 2)}</td><td>${fmt(tem_fee)}</td></tr>
-            <tr><td>STEM</td><td>${RATE.STEM}</td><td>${fmt(stem, 2)}</td><td>${fmt(stem_fee)}</td></tr>
-            <tr><td>SAED</td><td>${RATE.SAED}</td><td>${saed}</td><td>${fmt(saed_fee)}</td></tr>
-            <tr><td>HRTEM</td><td>${RATE.HRTEM}</td><td>${hrtem}</td><td>${fmt(hrtem_fee)}</td></tr>
-            <tr><td>EDS mapping</td><td>${RATE.EDSMAP}</td><td>${edsmap}</td><td>${fmt(edsmap_fee)}</td></tr>
-            <tr><td>EDS linescan</td><td>${RATE.EDSLINE}</td><td>${edsline}</td><td>${fmt(edsline_fee)}</td></tr>
-            <tr><td>AC-STEM</td><td>${RATE.ACSTEM}</td><td>${fmt(acstem, 2)}</td><td>${fmt(acstem_fee)}</td></tr>
-            <tr><td>离子减薄</td><td>${RATE.IONTHIN}</td><td>${ionthinning}</td><td>${fmt(ionthinning_fee)}</td></tr>
-            <tr><td>EELS</td><td>${RATE.EELS}</td><td>${eels}</td><td>${fmt(eels_fee)}</td></tr>
-            <tfoot><tr><td colspan="3">合计</td><td>${fmt(quoted)}</td></tr></tfoot></table>`;
-        $("feeOut").innerHTML = table;
-
-        $("quoted").value = fmt(quoted);
-        // Fix for OA bug: always update OA value with quoted value
-        $("oa").value = fmt(quoted * OA_RATIO);
-
-        return { quoted, tem, acstem };
-    }
-    
-    // Copy items to clipboard in the new specified order
-    function copyItems() {
-        const tem = safeF($("tem").value), stem = safeF($("stem").value), saed = safeI($("saed").value), hrtem = safeI($("hrtem").value), edsmap = safeI($("edsmap").value), edsline = safeI($("edsline").value), acstem = safeF($("acstem").value), ionthinning = safeI($('ionthinning').value), eels = safeF($('eels').value);
-        const items = [];
-        if (tem > 0) items.push(`TEM x${fmt(tem, 1)}h`);
-        if (stem > 0) items.push(`STEM x${fmt(stem, 1)}h`);
-        if (saed > 0) items.push(`SAED x${saed}`);
-        if (hrtem > 0) items.push(`HRTEM x${hrtem}`);
-        if (edsmap > 0) items.push(`EDS mapping x${edsmap}`);
-        if (edsline > 0) items.push(`EDS linescan x${edsline}`);
-        if (acstem > 0) items.push(`AC-STEM x${fmt(acstem, 1)}h`);
-        if (eels > 0) items.push(`eels x${fmt(eels, 1)}`);
-        if (ionthinning > 0) items.push(`离子减薄 x${ionthinning}`);
-
-        const str = items.join(', ');
-        $("itemsLine").value = str;
-        
-        if(copyToClipboardFallback(str)) {
-            showToast("条目已复制!");
-        } else {
-            showToast("复制失败，请手动复制。");
-        }
-    }
-
-    // Generate Markdown text
-    function makeMarkdown() {
-        const rawDate = ($("date").value || '').trim();
-        const mode = $("mode").value;
-        const tester = $("tester").value.trim();
-        const itemsLine = $("itemsLine").value.trim();
-        const { quoted, tem, acstem } = calculateFees();
-        const quotedVal = parseFloat($("quoted").value || quoted) || 0;
-        const oaVal = parseFloat($("oa").value) || quotedVal * OA_RATIO;
-        const actual = quotedVal * ACTUAL_RATIO;
-        const samples = ($("samples").value.trim() || '').split('；').map(s => s.trim()).filter(Boolean);
-
-        let out = "";
-        if (mode === "A") {
-            const dateA = parseDateA(rawDate);
-            out += `::${dateA}::\n`;
-            if (samples.length) {
-                out += `1. ${samples.join('；')} ✅\n`;
-            } else {
-                out += `1. 未命名项目 ✅\n`;
-            }
-            out += `> ${itemsLine}\n`;
-            out += `> ${fmt(quotedVal)} / ${fmt(oaVal)} / ${fmt(actual)} RMB\n`;
-            if (tester) out += `> 测试人：${tester}\n`;
-            out += `---`;
-        } else if (mode === "B") {
-            const dateB = parseDateB(rawDate);
-            if (tem > 0) { out += `日期：${dateB}\n电镜：场发射（检查）\n测试时间：${fmt(tem * 60, 0)}分钟\n测试老师：禄晓玥\n备注：${samples.join('；')}\n\n`; }
-            if (acstem > 0) { out += `日期：${dateB}\n电镜：球差\n测试时间：${fmt(acstem, 0)}小时\n测试老师：禄晓玥\n备注：${samples.join('；')}\n`; }
-        } else {
-            const dateC = parseDateB(rawDate);
-            const sampleCell = samples.join('；');
-            if (tem > 0) {
-                const hours = tem; const minutes = Math.round(tem * 60);
-                out += `场发射\t${sampleCell}\t检查\t${dateC}\t${fmtNum(hours)}\t${minutes}\n`;
-            }
-            if (acstem > 0) {
-                const hours = acstem; const minutes = Math.round(acstem * 60);
-                out += `球差\t${sampleCell}\t原子像\t${dateC}\t${fmtNum(hours)}\t${minutes}\n`;
-            }
-        }
-        $("mdOut").textContent = out;
-        return out;
-    }
-
-    // Event listeners
-    $("calc").onclick = () => {
-        calculateFees();
-        copyItems();
-        makeMarkdown();
-    };
-    $("reset").onclick = () => resetInputs();
-    $("copyItems").onclick = () => copyItems();
-    $("gen").onclick = () => makeMarkdown();
-    $("copyMd").onclick = () => {
-        const t = $("mdOut").textContent;
-        if (!t) makeMarkdown();
-        if(copyToClipboardFallback($("mdOut").textContent)) {
-            showToast("内容已复制!");
-        } else {
-            showToast("复制失败，请手动复制。");
-        }
-    };
-    $("downloadMd").onclick = () => {
-        const blob = new Blob([$("mdOut").textContent || makeMarkdown()], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'TEM-output.txt';
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 500);
-    };
-
-    $('toggleItems').onclick = () => {
         const optional = $('optionalItems');
-        optional.classList.toggle('expanded');
-        $('toggleItems').textContent = optional.classList.contains('expanded') ? '收起不常用项目' : '展开更多项目';
-    };
-
-    $("copyOaBtn").onclick = () => {
-        const n = Math.round(parseFloat($("oa").value) || 0);
-        if(copyToClipboardFallback(String(n))) {
-            showToast("OA值已复制!");
-        } else {
-            showToast("复制失败，请手动复制。");
+        if(optional) {
+            optional.classList.remove('expanded');
+            // 还需要更新展开/收起按钮的文本
+            const toggleBtn = $('toggleItems');
+            if (toggleBtn) {
+                toggleBtn.textContent = '展开更多项目';
+            }
         }
-    };
-})();
-</script>
+    } // 漏掉的右花括号在这里
+}); // document.addEventListener 的右花括号
+
+})();</script>
 </body>
 </html>
